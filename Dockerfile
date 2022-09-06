@@ -111,3 +111,8 @@ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo ap
 apt update && \
 apt install ros-melodic-desktop-full -y
 
+RUN apt install ros-melodic-navigation \
+ros-melodic-robot-localization \
+ros-melodic-robot-state-publisher \
+ros-melodic-velodyne -y
+
