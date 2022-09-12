@@ -1,4 +1,4 @@
-This builds an environment for [LIOVIL_SAM](https://github.com/TitoArevaloRamirez/liovil_sam).
+This builds an environment for [LIOSAM](https://github.com/fyandun/liosam_new_payload) for the new payload.
 
 You can run `source build_dockerfile.sh` to build the docker file.
 

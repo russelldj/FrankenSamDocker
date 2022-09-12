@@ -16,9 +16,31 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Update Ubuntu Software repository
 RUN apt update
-# Install vim as a general utility
+RUN apt install curl -y
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' && \
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add - && \
+apt update
+
+RUN apt install ros-melodic-desktop-full -y
+RUN apt install ros-melodic-navigation \
+ros-melodic-robot-localization \
+ros-melodic-robot-state-publisher \
+ros-melodic-velodyne \
+ros-melodic-tf \
+ros-melodic-cv-bridge \
+ros-melodic-pcl-conversions \
+ros-melodic-pcl-ros \
+ros-melodic-image-transport \
+ros-melodic-velodyne-pointcloud -y
+
 RUN apt install git vim wget unzip cmake -y
 RUN apt install libgoogle-glog-dev libgflags-dev libatlas-base-dev libeigen3-dev libsuitesparse-dev -y
+
+RUN apt install build-essential  pkg-config libgtk-3-dev \
+libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
+libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
+gfortran openexr libatlas-base-dev python3-dev python3-numpy \
+libtbb2 libtbb-dev libdc1394-22-dev qtbase5-dev -y
 
 # Install Ceres
 RUN mkdir ~/install/CeresSolver -p && \
@@ -41,12 +63,6 @@ cmake -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF -DCMAKE_BUILD_TYPE=Release .. && \
 sudo make install -j8 && \
 cd ~/install/ && \
 rm gtsam.zip
-
-RUN apt install build-essential  pkg-config libgtk-3-dev \
-libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
-libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
-gfortran openexr libatlas-base-dev python3-dev python3-numpy \
-libtbb2 libtbb-dev libdc1394-22-dev qtbase5-dev -y
 
 RUN mkdir ~/install/opencv_3.3.1 -p && \
 cd ~/install/opencv_3.3.1 && \ 
@@ -85,34 +101,16 @@ cmake -D WITH_TBB=ON \
 RUN cd ~/install/opencv_3.3.1/opencv_build && make 
 RUN cd ~/install/opencv_3.3.1/opencv_build && make install
 
-#RUN sudo apt-get install ros-melodic-navigation \
-#ros-melodic-robot-state-publisher \
-RUN apt install ros-melodic-tf \
-ros-melodic-cv-bridge \
-ros-melodic-pcl-conversions \
-ros-melodic-pcl-ros \
-ros-melodic-image-transport \
-ros-melodic-velodyne-pointcloud -y
-
+RUN apt install tmux -y
 
 RUN mkdir ~/catkin_ws/src -p && \
 cd ~/catkin_ws/src && \
-git clone https://github.com/russelldj/liovil_sam.git && \
-cd liovil_sam/liovil_sam 
+git clone https://github.com/fyandun/liosam_new_payload.git 
+
+RUN export CMAKE_MODULE_PATH=$CMAKE_MODULE_PATH:/root/install/opencv_3.3.1/opencv_install
+RUN echo $CMAKE_MODULE_PATH
 
 RUN cd ~/catkin_ws && \
 source /opt/ros/melodic/setup.bash && \
-catkin_make -j 8 --cmake-args -DGTSAM_INCLUDE_DIRS=/usr/local/include/
-
-RUN apt install curl -y
-
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' && \
-curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add - && \
-apt update && \
-apt install ros-melodic-desktop-full -y
-
-RUN apt install ros-melodic-navigation \
-ros-melodic-robot-localization \
-ros-melodic-robot-state-publisher \
-ros-melodic-velodyne -y
+catkin_make -j 8 --cmake-args -DGTSAM_INCLUDE_DIRS=/usr/local/include/ 
 
